@@ -22,14 +22,23 @@ export default function AppRapierPhysics() {
     ],
     []
   );
+
   return (
-    <KeyboardControls map={map}>
-      <Canvas shadows camera={{ position: [10, 10, 10], fov: 50 }}>
-        <color attach="background" args={["#ececec"]} />
-        <Physics debug>
-          <Experience />
-        </Physics>
-      </Canvas>
-    </KeyboardControls>
+    <>
+      <KeyboardControls map={map}>
+        <Canvas
+          shadows
+          camera={{ position: [3, 3, 3], near: 0.1, fov: 40 }}
+          style={{
+            touchAction: "none",
+          }}
+        >
+          <color attach="background" args={["#ececec"]} />
+          <Physics debug>
+            <Experience />
+          </Physics>
+        </Canvas>
+      </KeyboardControls>
+    </>
   );
 }

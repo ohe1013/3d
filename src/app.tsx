@@ -1,7 +1,6 @@
 import { KeyboardControls } from "@react-three/drei";
 import Experience from "./RapierPhysics/Experience";
 import { Canvas } from "@react-three/fiber";
-import { Physics } from "@react-three/rapier";
 import { useMemo } from "react";
 
 export const Controls = {
@@ -10,6 +9,7 @@ export const Controls = {
   left: "leftward",
   right: "rightward",
   jump: "jump",
+  run: "run",
 };
 export default function AppRapierPhysics() {
   const map = useMemo(
@@ -18,7 +18,7 @@ export default function AppRapierPhysics() {
       { name: Controls.back, keys: ["ArrowDown", "KeyS"] },
       { name: Controls.left, keys: ["ArrowLeft", "KeyA"] },
       { name: Controls.right, keys: ["ArrowRight", "KeyD"] },
-      { name: Controls.jump, keys: ["Space"] },
+      { name: Controls.run, keys: ["Shift"] },
     ],
     []
   );
@@ -34,9 +34,7 @@ export default function AppRapierPhysics() {
           }}
         >
           <color attach="background" args={["#ececec"]} />
-          <Physics debug>
-            <Experience />
-          </Physics>
+          <Experience />
         </Canvas>
       </KeyboardControls>
     </>

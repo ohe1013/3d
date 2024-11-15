@@ -1,18 +1,36 @@
-import { Box,  OrbitControls, PositionalAudio } from "@react-three/drei";
+import { Box, Environment, OrthographicCamera, PositionalAudio } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { RigidBody } from "@react-three/rapier";
+import { Physics, RigidBody } from "@react-three/rapier";
 import { useRef, useState } from "react";
 import CharacterController from "../features/Character/CharacterController";
 
 export default function Experience() {
+  const shadowCameraRef = useRef(null);
   return (
     <>
       <ConcertAudio />
-      <ambientLight intensity={0.5} />
-      <directionalLight position={[-10, 10, 0]} intensity={0.4} />
-      <OrbitControls />
-      <CharacterController />
-      <Ground />
+      <Environment preset="sunset" />
+      <directionalLight
+        intensity={0.65}
+        castShadow
+        position={[-15, 10, 15]}
+        shadow-mapSize-width={2048}
+        shadow-mapSize-height={2048}
+        shadow-bias={-0.00005}
+      >
+        <OrthographicCamera
+          left={-22}
+          right={15}
+          top={10}
+          bottom={-20}
+          ref={shadowCameraRef}
+          attach={"shadow-camera"}
+        />
+      </directionalLight>
+      <Physics>
+        <CharacterController />
+        <Ground />
+      </Physics>
     </>
   );
 }

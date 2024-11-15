@@ -4,6 +4,8 @@ import { Group, MathUtils, Vector3 } from "three";
 import { useFrame } from "@react-three/fiber";
 import { useKeyboardControls } from "@react-three/drei";
 import { CapsuleCollider, RapierRigidBody, RigidBody } from "@react-three/rapier";
+import { degToRad } from "three/src/math/MathUtils";
+import { useControls } from "leva";
 
 const normalizeAngle = (angle: number) => {
   while (angle > Math.PI) angle -= 2 * Math.PI;
@@ -26,13 +28,16 @@ const lerpAngle = (start: number, end: number, t: number) => {
   return normalizeAngle(start + (end - start) * t);
 };
 export default function CharacterController() {
-  const [characterPosition, setCharacterPosition] = useState<[number, number, number]>([
-    0, -0.55, 0,
-  ]);
-
-  const RUN_SPEED = useRef(0.8);
-  const WALK_SPEED = useRef(1.6);
-  const ROTATION_SPEED = useRef(0.2);
+  const { WALK_SPEED, RUN_SPEED, ROTATION_SPEED } = useControls("Character Control", {
+    WALK_SPEED: { value: 0.8, min: 0.1, max: 4, step: 0.1 },
+    RUN_SPEED: { value: 1.6, min: 0.2, max: 12, step: 0.1 },
+    ROTATION_SPEED: {
+      value: degToRad(0.5),
+      min: degToRad(0.1),
+      max: degToRad(5),
+      step: degToRad(0.1),
+    },
+  });
   const rb = useRef<RapierRigidBody>(null);
   const container = useRef<Group>(null);
   const character = useRef<Group>(null);
@@ -75,8 +80,8 @@ export default function CharacterController() {
       const movement = {
         x: 0,
         z: 0,
+        y: 0,
       };
-
       if (get().forward) {
         movement.z = 1;
       }
@@ -84,7 +89,7 @@ export default function CharacterController() {
         movement.z = -1;
       }
 
-      let speed = get().run ? RUN_SPEED.current : WALK_SPEED.current;
+      let speed = get().run ? RUN_SPEED : WALK_SPEED;
 
       if (isClicking.current) {
         if (Math.abs(pointer.x) > 0.1) {
@@ -92,26 +97,26 @@ export default function CharacterController() {
         }
         movement.z = pointer.y + 0.4;
         if (Math.abs(movement.x) > 0.5 || Math.abs(movement.z) > 0.5) {
-          speed = RUN_SPEED.current;
+          speed = RUN_SPEED;
         }
       }
 
-      if (get().left) {
+      if (get().leftward) {
         movement.x = 1;
       }
-      if (get().right) {
+      if (get().rightward) {
         movement.x = -1;
       }
 
       if (movement.x !== 0) {
-        rotationTarget.current += ROTATION_SPEED.current * movement.x;
+        rotationTarget.current += ROTATION_SPEED * movement.x;
       }
 
       if (movement.x !== 0 || movement.z !== 0) {
         characterRotationTarget.current = Math.atan2(movement.x, movement.z);
         vel.x = Math.sin(rotationTarget.current + characterRotationTarget.current) * speed;
         vel.z = Math.cos(rotationTarget.current + characterRotationTarget.current) * speed;
-        if (speed === RUN_SPEED.current) {
+        if (speed === RUN_SPEED) {
           setAnimation("run");
         } else {
           setAnimation("walk");
@@ -119,6 +124,7 @@ export default function CharacterController() {
       } else {
         setAnimation("idle");
       }
+
       character.current!.rotation.y = lerpAngle(
         character.current!.rotation.y,
         characterRotationTarget.current,

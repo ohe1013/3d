@@ -2,7 +2,7 @@ import { useAnimations, useGLTF } from "@react-three/drei";
 import { useEffect, useRef } from "react";
 
 export default function Character({ animation, ...props }) {
-  const group = useRef();
+  const group = useRef(null);
   const { nodes, materials, animations } = useGLTF("/assets/character.glb");
   const { actions } = useAnimations(animations, group);
   useEffect(() => {
